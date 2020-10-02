@@ -52,18 +52,6 @@ A Survey and Taxonomy") and ambiguity in traffic *scenes*, the used evaluation m
   - Uni-modal models: Yields 1 prediction per input sample
   - Multi-modal: Yields multiple hypotheses (up to 3) - further described by a confidence vector.   
 
-<details>
-<summary>For definitions, expand</summary>
-
-*Uni-modal*: In statistics, a unimodal (probability) distributioon is a (prob) distribution possesing a single unique *mode*, which, in this context, may refer to any peak (highest value) in the distribution.     
-
-*Mode*: Is the most commonly/frequently occuring value/number in a dataset. In the context of   
-discrete random variables (DRV) & discrete probability distributions (DPD), the mode of a RDV, X, is the  
-value, x, at which the probability mass function, PMF, of the DRV X, attains its maximum value. In short, the mode is the value that is most likely to be sampled. Lastly, numerical value of the mean (AKA expectation) parameter, $\mu$, and median, of a Normal (AKA Gaussian) (probability) distribution (NPD or GPD), are both also the same as the mode of a normal prob dist.    
-
-*Multi-modal*: In general, a multi-modal (probability) distribution is a probability distribution with two (bimodal dist) or more different modes. These modes appear as distinct peaks (local maximas) in a probability density function (PDF).
-</details>
-
 <ins>Evaluation & Scoring</ins>
 
 <!--- > **Note:** We are *encouraged* to employ/make submissions of multi-modal predictions as traffic scenes can contain a large amount of ambiguity & uncertainty. Furthermore, we are "asked to submit predictions for a private test set (no ground truth is available)" and our "solutions will be scored by Kaggle." [^1]. --->
@@ -72,13 +60,39 @@ value, x, at which the probability mass function, PMF, of the DRV X, attains its
 
 - The scoring is done by calculating the negative log-likelihood of the ground truth data given the multi-modal predictions.    
 
-Now, let's assume we have ourselves a **sample trajectory** which has the following **ground truth positions**:
-$$x_{1}, \ y_{1} \\ x_{2}, \ y_{2} \\ ... \\ x_{T}, \ y_{T}$$
-Now, say that we want to predict **K hypotheses**, which are represented by:
-$$\bar{x}_{1}^{k}, \ \bar{y}_{1}^{k} \\[0.08cm] \bar{x}_{2}^{k}, \ \bar{y}_{2}^{k} \\[0.08cm] ... \\[0.08cm] \bar{x}_{T}^{k}, \ \bar{y}_{T}^{k}$$
-And that we also want to predict the **confidences**, **c**, of these K hypotheses.   
-Now, let's assume that the ground truth positions are modeled by a mixture of multi-dimensional independent Normal distributions over time. This gives rise to the likelihood function:
-$$p(x_{1,...,T}, \ y_{1,...,T} \ | \ c^{1,...,K}, \ \bar{x}_{1,...,T}^{1,...,K}, \ \bar{y}_{1,...,T}^{1,...,K})$$
+
+<ins>Tasks List</ins>
+
+- [ ] Get a good, solid grasp of the [data](https://www.kaggle.com/c/lyft-motion-prediction-autonomous-vehicles/data).
+    - [ ] Familiarise thy self with Lyft's Level 5 departments [L5Kit](https://github.com/lyft/l5kit) Python library.  
+    - [ ] Understand Numpy [structured arrays](https://numpy.org/doc/stable/user/basics.rec.html). 
+    - [ ] Understand the [zarr](https://zarr.readthedocs.io/en/stable/) data format.
+    - [ ] Understand the [4 Numpy structured array types](https://github.com/lyft/l5kit/blob/master/data_format.md) `scenes`, `frames`, `agents` and `tl_faces`.
+    - [ ] Understand the `World`, `Agent`, `Image`, `Satellite` and `Semantic` [coordinate systems](https://github.com/lyft/l5kit/blob/master/coords_systems.md).
+    - [ ] Briefly understand [rasterization](https://en.wikipedia.org/wiki/Rasterisation)
+- [ ] "Skim" through the IPython Notebook on [visualizing](https://github.com/lyft/l5kit/blob/master/examples/visualisation/visualise_data.ipynb) the data
+- [ ] Actually understand the (agent motion prediction process)[https://github.com/lyft/l5kit/blob/master/examples/agent_motion_prediction/agent_motion_prediction.ipynb]
+
+<ins>Terminologies & Concepts</ins>
+
+<details>
+<summary>For definitions, expand</summary>
+
+- *Uni-modal*: In statistics, a unimodal (probability) distributioon is a (prob) distribution possesing a single unique *mode*, which, in this context, may refer to any peak (highest value) in the distribution.     
+
+- *Mode*: Is the most commonly/frequently occuring value/number in a dataset. In the context of   
+discrete random variables (DRV) & discrete probability distributions (DPD), the mode of a RDV, X, is the  
+value, x, at which the probability mass function, PMF, of the DRV X, attains its maximum value. In short, the mode is the value that is most likely to be sampled. Lastly, numerical value of the mean (AKA expectation) parameter, $\mu$, and median, of a Normal (AKA Gaussian) (probability) distribution (NPD or GPD), are both also the same as the mode of a normal prob dist.    
+
+- *Multi-modal*: In general, a multi-modal (probability) distribution is a probability distribution with two (bimodal dist) or more different modes. These modes appear as distinct peaks (local maximas) in a probability density function (PDF).
+
+- *Rasterization*: The conversion/transformation process from (raw) data in vector graphic format to raster image AKA multi-channel image, e.g. an RGB image displayed on your screen 
+</details>
+
+
+
+
+
 
 
 
