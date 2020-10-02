@@ -61,7 +61,7 @@ A Survey and Taxonomy") and ambiguity in traffic *scenes*, the used evaluation m
 - The scoring is done by calculating the negative log-likelihood of the ground truth data given the multi-modal predictions.    
 
 
-<ins>Tasks List</ins>
+## Tasks List
 
 - [ ] Get a good, solid grasp of the [data](https://www.kaggle.com/c/lyft-motion-prediction-autonomous-vehicles/data).
     - [ ] Familiarise thy self with Lyft's Level 5 departments [L5Kit](https://github.com/lyft/l5kit) Python library.  
@@ -73,7 +73,7 @@ A Survey and Taxonomy") and ambiguity in traffic *scenes*, the used evaluation m
 - [ ] "Skim" through the IPython Notebook on [visualizing](https://github.com/lyft/l5kit/blob/master/examples/visualisation/visualise_data.ipynb) the data
 - [ ] Actually understand the (agent motion prediction process)[https://github.com/lyft/l5kit/blob/master/examples/agent_motion_prediction/agent_motion_prediction.ipynb]
 
-<ins>Terminologies & Concepts</ins>
+## Terminologies & Concepts
 
 <details>
 <summary>For definitions, expand</summary>
