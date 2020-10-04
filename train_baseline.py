@@ -38,9 +38,9 @@ default_cfg = {
     
     'train_data_loader': {
         'key': 'scenes/train.zarr',
-        'batch_size': 16,
+        'batch_size': 32,
         'shuffle': True,
-        'num_workers': 4
+        'num_workers': 8
     },
     
     'train_params': {
@@ -52,13 +52,16 @@ if __name__ == "__main__":
     cfg = default_cfg.copy()
 
     # set env variable for data
-    os.environ["L5KIT_DATA_FOLDER"] = DIR_INPUT
+    # os.environ["L5KIT_DATA_FOLDER"] = DIR_INPUT
     dm = LocalDataManager(None)
 
     print("DEBUG =", cfg['debug'])
 
     if not 'max_num_steps' in cfg['train_params']:
-        cfg['train_params']['max_num_steps'] = 100 if cfg['debug'] else 1000
+        cfg['train_params']['max_num_steps'] = 100 if cfg['debug'] else 50000
+    
+    print("cfg =")
+    print(cfg)
 
 
     # ===== INIT DATASET
