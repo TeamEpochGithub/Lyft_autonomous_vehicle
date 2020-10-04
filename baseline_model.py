@@ -1,3 +1,6 @@
+import torch
+import torchvision
+
 from torch import nn
 from torchvision.models.resnet import resnet18
 from typing import Dict

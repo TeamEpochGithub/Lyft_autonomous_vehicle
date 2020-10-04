@@ -40,9 +40,9 @@ default_cfg = {
     
     'test_data_loader': {
         'key': 'scenes/test.zarr',
-        'batch_size': 8,
+        'batch_size': 16,
         'shuffle': False,
-        'num_workers': 4
+        'num_workers': 16
     }
 }
 
