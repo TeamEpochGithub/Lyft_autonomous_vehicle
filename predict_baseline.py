@@ -48,8 +48,8 @@ default_cfg = {
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("input-dir", type=str, help="where to find the competition data")
-    parser.add_argument("weight-file", type=str, help="path tho the file containing the weights for the model")
+    parser.add_argument("--input-dir", type=str, help="where to find the competition data")
+    parser.add_argument("--weight-file", type=str, help="path tho the file containing the weights for the model")
     args = parser.parse_args()
 
     DIR_INPUT = args.input_dir
