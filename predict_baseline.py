@@ -42,7 +42,7 @@ default_cfg = {
         'key': 'scenes/test.zarr',
         'batch_size': 16,
         'shuffle': False,
-        'num_workers': 16
+        'num_workers': 8
     }
 }
 
@@ -122,7 +122,7 @@ if __name__ == "__main__":
             timestamps.append(data["timestamp"].numpy().copy())
             agent_ids.append(data["track_id"].numpy().copy())
 
-            write_pred_csv('submission.csv',
-                timestamps=np.concatenate(timestamps),
-                track_ids=np.concatenate(agent_ids),
-                coords=np.concatenate(future_coords_offsets_pd))
+    write_pred_csv('submission.csv',
+        timestamps=np.concatenate(timestamps),
+        track_ids=np.concatenate(agent_ids),
+        coords=np.concatenate(future_coords_offsets_pd))
