@@ -95,19 +95,6 @@ if __name__ == "__main__":
     timestamps = []
     agent_ids = []
 
-    i = 0
-        
-    def take(count):
-        
-        def fn(_element):
-            global i
-            
-            i += 1
-            
-            return i <= count
-        
-        return fn
-
     with torch.no_grad():
         dataiter = tqdm(test_dataloader)
         
