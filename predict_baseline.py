@@ -54,6 +54,7 @@ if __name__ == "__main__":
 
     DIR_INPUT = args.input_dir
     WEIGHT_FILE = args.weight_file
+    os.environ["L5KIT_DATA_FOLDER"] = DIR_INPUT
 
     dm = LocalDataManager(None)
     cfg = default_cfg.copy()
