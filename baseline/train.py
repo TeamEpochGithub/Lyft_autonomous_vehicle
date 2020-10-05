@@ -33,6 +33,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # Load config
+    os.environ["L5KIT_DATA_FOLDER"] = args.input_dir
     dm = LocalDataManager(None)
     cfg = load_config_data(args.config)
 
