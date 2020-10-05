@@ -89,8 +89,11 @@ if __name__ == "__main__":
             coords_offset = []
             
             for agent_coords, world_from_agent, centroid in zip(agents_coords, world_from_agents, centroids):
-                coords_offset.append(transform_points(agent_coords, world_from_agent) - centroid[:2])
-            
+                try:
+                    coords_offset.append(transform_points(agent_coords, world_from_agent) - centroid[:2])
+                except Exception as e:
+                    print(agent_coords, world_from_agent)
+                    raise e
             future_coords_offsets_pd.append(np.stack(coords_offset))
             timestamps.append(data["timestamp"].numpy().copy())
             agent_ids.append(data["track_id"].numpy().copy())
