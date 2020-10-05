@@ -9,7 +9,7 @@ model_params:
   pretrained: True
   first_layer_bias: False
 
-  history_num_frames: 0
+  history_num_frames: 10
   history_step_size: 1
   history_delta_time: 0.1
 

@@ -1,6 +1,7 @@
 # Custom
 *.pth
 submission.csv
+pred.csv
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
