@@ -63,37 +63,39 @@ if __name__ == "__main__":
     # Create model
     model = BaselineModel(cfg)
     model.to(device)
-    optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    model.load_state_dict(
+        torch.load(weight_file, map_location=device)
+    )
 
     # ==== EVAL LOOP
-    model.eval()
-    torch.set_grad_enabled(False)
+    with torch.no_grad():
+        model.eval()
 
-    # store information for evaluation
-    future_coords_offsets_pd = []
-    timestamps = []
-    agent_ids = []
+        # store information for evaluation
+        future_coords_offsets_pd = []
+        timestamps = []
+        agent_ids = []
 
-    print("Start eval loop")
-
-    progress_bar = tqdm(eval_dataloader)
-    for data in progress_bar:
-        outputs = model(data)
+        print("Start eval loop")
         
-        # convert agent coordinates into world offsets
-        agents_coords = outputs.cpu().numpy()
-        world_from_agents = data["world_from_agent"].numpy()
-        centroids = data["centroid"].numpy()
-        coords_offset = []
-        
-        for agent_coords, world_from_agent, centroid in zip(agents_coords, world_from_agents, centroids):
-            coords_offset.append(transform_points(agent_coords, world_from_agent) - centroid[:2])
-        
-        future_coords_offsets_pd.append(np.stack(coords_offset))
-        timestamps.append(data["timestamp"].numpy().copy())
-        agent_ids.append(data["track_id"].numpy().copy())
+        progress_bar = tqdm(eval_dataloader)
+        for data in progress_bar:
+            outputs = model(data["image"].to(device))
+            
+            # convert agent coordinates into world offsets
+            agents_coords = outputs.cpu().numpy()
+            world_from_agents = data["world_from_agent"].numpy()
+            centroids = data["centroid"].numpy()
+            coords_offset = []
+            
+            for agent_coords, world_from_agent, centroid in zip(agents_coords, world_from_agents, centroids):
+                coords_offset.append(transform_points(agent_coords, world_from_agent) - centroid[:2])
+            
+            future_coords_offsets_pd.append(np.stack(coords_offset))
+            timestamps.append(data["timestamp"].numpy().copy())
+            agent_ids.append(data["track_id"].numpy().copy())
 
-    print("Done eval loop")
+        print("Done eval loop")
 
     pred_path = f"pred.csv"
 
