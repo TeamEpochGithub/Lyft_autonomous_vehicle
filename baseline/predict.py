@@ -67,7 +67,7 @@ if __name__ == "__main__":
         torch.load(weight_file, map_location=device)
     )
 
-    # ==== EVAL LOOP
+    # Eval loop
     with torch.no_grad():
         model.eval()
 
