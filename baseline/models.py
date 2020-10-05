@@ -5,8 +5,9 @@ from torch import nn
 from torchvision.models.resnet import resnet50
 from typing import Dict
 
-class BaselineModel():
+class BaselineModel(nn.Module):
     def __init__(self, conf: Dict):
+        super().__init__()
         target_count = 2 * conf["model_params"]["future_num_frames"]
         history_channel_count = (conf["model_params"]["history_num_frames"] + 1) * 2
         total_channel_count = 3 + history_channel_count
