@@ -80,7 +80,8 @@ if __name__ == "__main__":
         
         progress_bar = tqdm(eval_dataloader)
         for data in progress_bar:
-            outputs = model(data["image"].to(device))
+            target_positions = data["target_positions"].to(device)
+            outputs = model(data["image"].to(device)).reshape(target_positions.shape)
             
             # convert agent coordinates into world offsets
             agents_coords = outputs.cpu().numpy()
