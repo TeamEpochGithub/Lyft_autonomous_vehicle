@@ -1,7 +1,7 @@
 from typing import Dict
 
 from tempfile import gettempdir
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from torch import nn, optim
@@ -24,7 +24,7 @@ from pathlib import Path
 import os
 
 # set env variable for data
-os.environ["L5KIT_DATA_FOLDER"] = "PATH_TO_DATA"
+# os.environ["L5KIT_DATA_FOLDER"] = "PATH_TO_DATA"
 dm = LocalDataManager(None)
 # get config
 cfg = load_config_data("./agent_motion_config.yaml")
@@ -110,12 +110,15 @@ print("Done train loop")
 # ===== GENERATE AND LOAD CHOPPED DATASET
 num_frames_to_chop = 100
 eval_cfg = cfg["val_data_loader"]
-eval_base_path = create_chopped_dataset(dm.require(eval_cfg["key"]), cfg["raster_params"]["filter_agents_threshold"], 
+if False:
+    eval_base_path = create_chopped_dataset(dm.require(eval_cfg["key"]), cfg["raster_params"]["filter_agents_threshold"], 
                               num_frames_to_chop, cfg["model_params"]["future_num_frames"], MIN_FUTURE_STEPS)
 
-eval_zarr_path = str(Path(eval_base_path) / Path(dm.require(eval_cfg["key"])).name)
-eval_mask_path = str(Path(eval_base_path) / "mask.npz")
-eval_gt_path = str(Path(eval_base_path) / "gt.csv")
+    eval_zarr_path = str(Path(eval_base_path) / Path(dm.require(eval_cfg["key"])).name)
+    eval_mask_path = str(Path(eval_base_path) / "mask.npz")
+    eval_gt_path = str(Path(eval_base_path) / "gt.csv")
+eval_zarr_path = dm.require(eval_cfg["key"])
+eval_mask_path = dm.require("scenes/mask.npz")
 
 eval_zarr = ChunkedDataset(eval_zarr_path).open()
 eval_mask = np.load(eval_mask_path)["arr_0"]
@@ -156,7 +159,7 @@ for data in progress_bar:
 
 print("Done eval loop")
 
-pred_path = f"{gettempdir()}/pred.csv"
+pred_path = f"pred.csv"
 
 write_pred_csv(pred_path,
                timestamps=np.concatenate(timestamps),

@@ -28,7 +28,7 @@ default_cfg = {
     },
     
     'raster_params': {
-        'raster_size': [300, 300],
+        'raster_size': [224, 224],
         'pixel_size': [0.5, 0.5],
         'ego_center': [0.25, 0.5],
         'map_type': 'py_semantic',
