@@ -76,6 +76,9 @@ if __name__ == "__main__":
         targets = data["target_positions"].to(device)
         target_availabilities = data["target_availabilities"].unsqueeze(-1).to(device)
 
+        for prediction in range(49, 0, -1):
+            targets[:, prediction, :] -= targets[:, prediction -1. :]
+
         output = model(
             data["image"].to(device)
         ).reshape(targets.shape)
