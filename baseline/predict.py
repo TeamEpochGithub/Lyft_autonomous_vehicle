@@ -85,6 +85,11 @@ if __name__ == "__main__":
             
             # convert agent coordinates into world offsets
             agents_coords = outputs.cpu().numpy()
+
+            agents_coords[:, 0, :] += data["history_positions"][:, -1, :].numpy()
+            for i in range(1, 50):
+                agents_coords[:, i, :] += agents_coords[:, i-1, :]
+
             world_from_agents = data["world_from_agent"].numpy()
             centroids = data["centroid"].numpy()
             coords_offset = []

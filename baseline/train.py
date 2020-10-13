@@ -29,6 +29,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--input-dir", type=str, help="Where to find the competition data")
     parser.add_argument("--config", type=str, help="Location of the config file")
+    parser.add_argument("--weight-file", type=str, default=None, help="path tho the file containing the weights for the model")
 
     args = parser.parse_args()
 
@@ -50,6 +51,11 @@ if __name__ == "__main__":
 
     # Create model
     model = BaselineModel(cfg)
+    if args.weight_file != None:
+        model.load_state_dict(
+            torch.load(args.weight_file)
+        )
+
     model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
   
@@ -73,11 +79,15 @@ if __name__ == "__main__":
             data = next(tr_it)
 
         # Calculate loss
-        targets = data["target_positions"].to(device)
+        targets = data["target_positions"]
         target_availabilities = data["target_availabilities"].unsqueeze(-1).to(device)
-
+        
         for prediction in range(49, 0, -1):
-            targets[:, prediction, :] -= targets[:, prediction -1. :]
+            targets[:, prediction, :] -= targets[:, prediction -1, :]
+        
+        targets[:, 0, :] -= data["history_positions"][:, -1, :]
+
+        targets = targets.to(device)
 
         output = model(
             data["image"].to(device)
