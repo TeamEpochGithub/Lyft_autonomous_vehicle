@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    # ===== INIT DATASET AND LOAD MASK
+    # Init dataset and load mask
     eval_dataset = AgentDataset(cfg, eval_zarr, rasterizer, agents_mask=eval_mask)
     eval_dataloader = DataLoader(eval_dataset, shuffle=eval_cfg["shuffle"], batch_size=eval_cfg["batch_size"], 
                                 num_workers=eval_cfg["num_workers"])
@@ -101,7 +101,7 @@ if __name__ == "__main__":
 
         print("Done eval loop")
 
-    pred_path = f"pred.csv"
+    pred_path = f"submission.csv"
 
     write_pred_csv(pred_path,
                 timestamps=np.concatenate(timestamps),
