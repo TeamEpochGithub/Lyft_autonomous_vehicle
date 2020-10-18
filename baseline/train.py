@@ -3,19 +3,18 @@ import numpy as np
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
-from torchvision.models.resnet import resnet50
 
+
+import l5kit
 from l5kit.configs import load_config_data
 from l5kit.data import LocalDataManager, ChunkedDataset
 from l5kit.dataset import AgentDataset, EgoDataset
 from l5kit.rasterization import build_rasterizer
-from l5kit.evaluation import write_pred_csv, compute_metrics_csv, read_gt_csv, create_chopped_dataset
+
 from l5kit.evaluation.chop_dataset import MIN_FUTURE_STEPS
-from l5kit.evaluation.metrics import neg_multi_log_likelihood, time_displace
-from l5kit.geometry import transform_points
 from l5kit.visualization import PREDICTED_POINTS_COLOR, TARGET_POINTS_COLOR, draw_trajectory
-# from prettytable import PrettyTable
-# from pathlib import Path
+
+
 
 import os
 import argparse
@@ -23,6 +22,8 @@ from tqdm import tqdm
 
 import models
 from models import BaselineModel
+
+import loss_functions
 
 if __name__ == "__main__":
     # Parse command line arguments
@@ -36,6 +37,8 @@ if __name__ == "__main__":
     os.environ["L5KIT_DATA_FOLDER"] = args.input_dir
     dm = LocalDataManager(None)
     cfg = load_config_data(args.config)
+
+    multi_mode = cfg["model_params"]["multi_mode"]
 
     # Create dataloaders
     train_cfg = cfg["train_data_loader"]
@@ -52,8 +55,10 @@ if __name__ == "__main__":
     model = BaselineModel(cfg)
     model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
-  
-    if cfg["train_params"]["loss"] == "mse":
+    
+    if multi_mode:
+        criterion = loss_functions.pytorch_neg_multi_log_likelihood_batch
+    elif cfg["train_params"]["loss"] == "mse":
         criterion = nn.MSELoss(reduction="none")
 
     # Train loop
@@ -79,6 +84,7 @@ if __name__ == "__main__":
         output = model(
             data["image"].to(device)
         ).reshape(targets.shape)
+
 
         loss = criterion(output, targets)
 
