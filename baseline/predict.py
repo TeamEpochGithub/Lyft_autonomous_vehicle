@@ -86,7 +86,7 @@ if __name__ == "__main__":
             # convert agent coordinates into world offsets
             agents_coords = outputs.cpu().numpy()
 
-            agents_coords[:, 0, :] += data["history_positions"][:, -1, :].numpy()
+            agents_coords[:, 0, :] += data["history_positions"][:, 0, :].numpy()
             for i in range(1, 50):
                 agents_coords[:, i, :] += agents_coords[:, i-1, :]
 

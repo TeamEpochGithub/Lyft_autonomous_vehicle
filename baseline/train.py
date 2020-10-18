@@ -48,6 +48,7 @@ if __name__ == "__main__":
                                   num_workers=train_cfg["num_workers"])
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print("device =", device)
 
     # Create model
     model = BaselineModel(cfg)
@@ -85,7 +86,7 @@ if __name__ == "__main__":
         for prediction in range(49, 0, -1):
             targets[:, prediction, :] -= targets[:, prediction -1, :]
         
-        targets[:, 0, :] -= data["history_positions"][:, -1, :]
+        targets[:, 0, :] -= data["history_positions"][:, 0, :]
 
         targets = targets.to(device)
 
