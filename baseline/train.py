@@ -84,17 +84,25 @@ if __name__ == "__main__":
 
         # Calculate loss
         targets = data["target_positions"].to(device)
-        target_availabilities = data["target_availabilities"].unsqueeze(-1).to(device)
+        target_availabilities = data["target_availabilities"].to(device)
 
         with autocast() if not torch.cuda.is_available() else nullcontext():
-            output = model(
-                data["image"].to(device)
-            ).reshape(targets.shape)
+            if multi_mode:
+                predictions, confidences = model(
+                    data["image"].to(device)
+                )
 
-            loss = criterion(output, targets)
+                loss = loss_functions.pytorch_neg_multi_log_likelihood_batch(targets, predictions, confidences, target_availabilities)
+            else:
+                target_availabilities = target_availabilities.unsqueeze(-1)
+                output = model(
+                    data["image"].to(device)
+                ).reshape(targets.shape)
 
-            loss = loss * target_availabilities
-            loss = loss.mean()
+                loss = criterion(output, targets)
+
+                loss = loss * target_availabilities
+                loss = loss.mean()
 
         # Backward pass
         optimizer.zero_grad()

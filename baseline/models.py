@@ -41,20 +41,21 @@ class BaselineModel(nn.Module):
     def forward(self, x):
         y = self.backbone(x)
 
-        batches, _ = y.shape
-
         if self.multi_mode:
-            pred, confidences = torch.split(x, self.future_num_frames * 3, dim=1)
+            batches, _ = y.shape
+
+            # print("y.shape =", y.shape)
+            # print("batches =", batches)
+
+            pred, confidences = torch.split(y, self.future_num_frames * 3 * 2, dim=1)
             pred = pred.view(batches, 3, self.future_num_frames, 2)
 
-            assert confidences.shape == (batches, 3)
+            # print("confidences.shape = ", confidences.shape)
+
+            # assert confidences.shape == (batches, 3)
 
             confidences = torch.softmax(confidences, dim=1)
 
             return pred, confidences
         else:
             return y
-
-class MultiMode(nn.Module):
-    def __init__():
-        pass
