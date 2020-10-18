@@ -3,6 +3,8 @@ import numpy as np
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
+from torch.cuda.amp import autocast
+
 from torchvision.models.resnet import resnet50
 
 from l5kit.configs import load_config_data
@@ -18,6 +20,8 @@ from l5kit.visualization import PREDICTED_POINTS_COLOR, TARGET_POINTS_COLOR, dra
 # from pathlib import Path
 
 import os
+from contextlib import nullcontext
+
 import argparse
 from tqdm import tqdm
 
@@ -76,14 +80,15 @@ if __name__ == "__main__":
         targets = data["target_positions"].to(device)
         target_availabilities = data["target_availabilities"].unsqueeze(-1).to(device)
 
-        output = model(
-            data["image"].to(device)
-        ).reshape(targets.shape)
+        with autocast() if not torch.cuda.is_available() else nullcontext():
+            output = model(
+                data["image"].to(device)
+            ).reshape(targets.shape)
 
-        loss = criterion(output, targets)
+            loss = criterion(output, targets)
 
-        loss = loss * target_availabilities
-        loss = loss.mean()
+            loss = loss * target_availabilities
+            loss = loss.mean()
 
         # Backward pass
         optimizer.zero_grad()
