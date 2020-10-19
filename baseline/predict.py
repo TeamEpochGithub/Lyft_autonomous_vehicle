@@ -4,6 +4,7 @@ import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
 from torchvision.models.resnet import resnet50
+from torch.cuda.amp import autocast
 
 from l5kit.configs import load_config_data
 from l5kit.data import LocalDataManager, ChunkedDataset
@@ -18,6 +19,8 @@ from l5kit.visualization import PREDICTED_POINTS_COLOR, TARGET_POINTS_COLOR, dra
 # from pathlib import Path
 
 import os
+from contextlib import nullcontext
+
 import argparse
 from tqdm import tqdm
 
@@ -55,6 +58,7 @@ if __name__ == "__main__":
     eval_mask = np.load(eval_mask_path)["arr_0"]
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print(device)
 
     # Init dataset and load mask
     eval_dataset = AgentDataset(cfg, eval_zarr, rasterizer, agents_mask=eval_mask)
@@ -94,13 +98,17 @@ if __name__ == "__main__":
 
             target_positions = data["target_positions"].to(device)
 
-            if multi_mode:
-                predictions, confidences = model(data["image"].to(device))
-                predictions = predictions.reshape(target_positions.shape + (3,))
-            else:
-                predictions = model(data["image"].to(device)).reshape(target_positions.shape)
+            with autocast() if torch.cuda.is_available() else nullcontext:
+                if multi_mode:
+                    predictions, confidences = model(data["image"].to(device))
+                    predictions = predictions.reshape(target_positions.shape + (3,))
+
+                    confidences = confidences.cpu().numpy()
+                else:
+                    predictions = model(data["image"].to(device)).reshape(target_positions.shape)
                 
             agents_coords = predictions.cpu().numpy()
+            # print(agents_coords.shape)
 
             # convert agent coordinates into world offsets
             world_from_agents = data["world_from_agent"].numpy()
@@ -109,11 +117,13 @@ if __name__ == "__main__":
             
             for agent_coords, world_from_agent, centroid in zip(agents_coords, world_from_agents, centroids):
                 if multi_mode:
-                    predictions = []
+                    predictions = np.zeros((3, 50, 2))
                     for i in range(3):
-                        predictions.append(transform_points(agent_coords[:, :, i], world_from_agent) - centroid[:2])
+                        predictions[i] = (transform_points(agent_coords[:, :, i], world_from_agent) - centroid[:2])
 
-                    coords_offset.append(np.concatenate(predictions))
+                    coords_offset.append(predictions)
+                    # print("coords_offset[-1].shape =", coords_offset[-1].shape)
+                    # print("predictions[-1].shape =", predictions[-1].shape)
                 else:
                     coords_offset.append(transform_points(agent_coords, world_from_agent) - centroid[:2])
 
@@ -130,6 +140,7 @@ if __name__ == "__main__":
                 timestamps=np.concatenate(timestamps),
                 track_ids=np.concatenate(agent_ids),
                 coords=np.concatenate(future_coords_offsets_pd),
+                confs=np.concatenate(all_confidences) if multi_mode else None
                 )
 
-    print("Written prediction csv. Everything is done.")
+    print("Written submission csv. Everything is done.")
