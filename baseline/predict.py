@@ -39,6 +39,8 @@ if __name__ == "__main__":
     os.environ["L5KIT_DATA_FOLDER"] = args.input_dir
     dm = LocalDataManager(None)
     cfg = load_config_data(args.config)
+
+    multi_mode = cfg["model_params"]["multi_mode"]
     
     # Generate and load chopped dataset
     rasterizer = build_rasterizer(cfg, dm)
@@ -75,29 +77,50 @@ if __name__ == "__main__":
         future_coords_offsets_pd = []
         timestamps = []
         agent_ids = []
+        all_confidences = []
 
         print("Start eval loop")
         
         progress_bar = tqdm(eval_dataloader)
+
+        j = 0
+
         for data in progress_bar:
+            if False:
+                if j > 10:
+                    break
+                else:
+                    j += 1
+
             target_positions = data["target_positions"].to(device)
-            outputs = model(data["image"].to(device)).reshape(target_positions.shape)
-            
+
+            if multi_mode:
+                predictions, confidences = model(data["image"].to(device))
+                predictions = predictions.reshape(target_positions.shape + (3,))
+            else:
+                predictions = model(data["image"].to(device)).reshape(target_positions.shape)
+                
+            agents_coords = predictions.cpu().numpy()
+
             # convert agent coordinates into world offsets
-            agents_coords = outputs.cpu().numpy()
             world_from_agents = data["world_from_agent"].numpy()
             centroids = data["centroid"].numpy()
             coords_offset = []
             
             for agent_coords, world_from_agent, centroid in zip(agents_coords, world_from_agents, centroids):
-                try:
+                if multi_mode:
+                    predictions = []
+                    for i in range(3):
+                        predictions.append(transform_points(agent_coords[:, :, i], world_from_agent) - centroid[:2])
+
+                    coords_offset.append(np.concatenate(predictions))
+                else:
                     coords_offset.append(transform_points(agent_coords, world_from_agent) - centroid[:2])
-                except Exception as e:
-                    print(agent_coords, world_from_agent)
-                    raise e
+
             future_coords_offsets_pd.append(np.stack(coords_offset))
             timestamps.append(data["timestamp"].numpy().copy())
             agent_ids.append(data["track_id"].numpy().copy())
+            all_confidences.append(confidences)
 
         print("Done eval loop")
 
