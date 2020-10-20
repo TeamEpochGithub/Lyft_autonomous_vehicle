@@ -36,8 +36,10 @@ if __name__ == "__main__":
     parser.add_argument("--input-dir", type=str, help="Where to find the competition data")
     parser.add_argument("--config", type=str, help="Location of the config file")
     parser.add_argument("--weight-file", type=str, default=None, help="path tho the file containing the weights for the model")
+    parser.add_argument("--multi-gpu", action='store_true', help="Enables training on multiple GPU's. Defaults to false")
 
     args = parser.parse_args()
+    print("multi-gpu =", args.multi_gpu)
 
     # Load config
     os.environ["L5KIT_DATA_FOLDER"] = args.input_dir
@@ -65,6 +67,10 @@ if __name__ == "__main__":
         )
     
     model.to(device)
+
+    if args.multi_gpu:
+        model = nn.DataParallel(model)
+
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
     
     if multi_mode:
