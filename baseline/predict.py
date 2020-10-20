@@ -130,7 +130,8 @@ if __name__ == "__main__":
             future_coords_offsets_pd.append(np.stack(coords_offset))
             timestamps.append(data["timestamp"].numpy().copy())
             agent_ids.append(data["track_id"].numpy().copy())
-            all_confidences.append(confidences)
+            if multi_mode:
+                all_confidences.append(confidences)
 
         print("Done eval loop")
 
