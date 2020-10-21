@@ -82,17 +82,32 @@ if __name__ == "__main__":
     print("Start train loop")
     
     tr_it = iter(train_dataloader)
-    progress_bar = tqdm(range(cfg["train_params"]["max_num_steps"]))
+    max_steps = cfg["train_params"]["max_num_steps"]
+
+    if max_steps >= 0:
+        progress_bar = tqdm(range(max_steps))
+        all_data = False
+    else:
+        progress_bar = tqdm(tr_it)
+        all_data = True
+        iteration_index = 0
+    
     losses_train = []
     model.train()
     torch.set_grad_enabled(True)
+
     
     for itr in progress_bar:
-        try:
-            data = next(tr_it)
-        except StopIteration:
-            tr_it = iter(train_dataloader)
-            data = next(tr_it)
+        if all_data:
+            data = itr
+            iteration_index += 1
+        else:
+            try:
+                data = next(tr_it)
+            except StopIteration:
+                tr_it = iter(train_dataloader)
+                data = next(tr_it)
+            iteration_index = itr + 1
 
         # Calculate loss
         targets = data["target_positions"].to(device)
@@ -121,8 +136,8 @@ if __name__ == "__main__":
         loss.backward()
         optimizer.step()
 
-        if (itr+1) % cfg['train_params']['checkpoint_every_n_steps'] == 0 and not cfg['debug']:
-            torch.save(model.state_dict(), f'model_state_{itr}.pth')
+        if (iteration_index) % cfg['train_params']['checkpoint_every_n_steps'] == 0 and not cfg['debug']:
+            torch.save(model.state_dict(), f'model_state_{iteration_index}.pth')
         
         losses_train.append(loss.item())
         losses_train = losses_train[-100:]
