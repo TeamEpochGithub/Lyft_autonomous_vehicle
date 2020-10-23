@@ -135,13 +135,20 @@ if __name__ == "__main__":
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-
+        if multi_gpu:
+            state_dict = model.module.state_dict()
+        else:
+            state_dict = model.state_dict()
         if (iteration_index) % cfg['train_params']['checkpoint_every_n_steps'] == 0 and not cfg['debug']:
-            torch.save(model.state_dict(), f'model_state_{iteration_index}.pth')
+            torch.save(state_dict, f'model_state_{iteration_index}.pth')
         
         losses_train.append(loss.item())
         losses_train = losses_train[-100:]
         progress_bar.set_description(f"loss: {loss.item()} loss(avg): {np.mean(losses_train)}")
 
     if not cfg['debug']:
-        torch.save(model.state_dict(), f"model_state_last.pth")
+        if multi_gpu:
+            state_dict = model.module.state_dict()
+        else:
+            state_dict = model.state_dict()
+        torch.save(state_dict, f"model_state_last.pth")
