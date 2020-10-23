@@ -67,8 +67,8 @@ if __name__ == "__main__":
         )
     
     model.to(device)
-
-    if args.multi_gpu:
+    multi_gpu = args.multi_gpu
+    if multi_gpu:
         model = nn.DataParallel(model)
 
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
