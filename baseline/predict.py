@@ -117,13 +117,16 @@ if __name__ == "__main__":
             
             for agent_coords, world_from_agent, centroid in zip(agents_coords, world_from_agents, centroids):
                 if multi_mode:
-                    predictions = np.zeros((3, 50, 2))
-                    for i in range(3):
-                        predictions[i] = (transform_points(agent_coords[:, :, i], world_from_agent) - centroid[:2])
+                    if True:
+                        predictions = transform_points(agent_coords[:, :])
+                    else:
+                        predictions = np.zeros((3, 50, 2))
+                        for i in range(3):
+                            predictions[i] = (transform_points(agent_coords[:, :, i], world_from_agent) - centroid[:2])
 
                     coords_offset.append(predictions)
-                    # print("coords_offset[-1].shape =", coords_offset[-1].shape)
-                    # print("predictions[-1].shape =", predictions[-1].shape)
+                        # print("coords_offset[-1].shape =", coords_offset[-1].shape)
+                        # print("predictions[-1].shape =", predictions[-1].shape)
                 else:
                     coords_offset.append(transform_points(agent_coords, world_from_agent) - centroid[:2])
 
