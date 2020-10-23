@@ -117,7 +117,7 @@ if __name__ == "__main__":
             
             for agent_coords, world_from_agent, centroid in zip(agents_coords, world_from_agents, centroids):
                 if multi_mode:
-                    if True:
+                    if False:
                         predictions = agent_coords.transpose(2, 0, 1)
                         # print(predictions.shape)
                     else:
