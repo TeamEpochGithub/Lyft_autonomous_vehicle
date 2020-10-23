@@ -17,18 +17,28 @@ from l5kit.rasterization import build_rasterizer
 from l5kit.evaluation.chop_dataset import MIN_FUTURE_STEPS
 from l5kit.visualization import PREDICTED_POINTS_COLOR, TARGET_POINTS_COLOR, draw_trajectory
 
-
-
 import os
 from contextlib import nullcontext
 
 import argparse
 from tqdm import tqdm
 
+import matplotlib.pyplot as plt
+
 import models
 from models import BaselineModel
 
 import loss_functions
+
+def __plot_progress(losses, save=False):
+    plt.plot([x[1] for x in losses], [x[0] for x in losses])
+    plt.ylabel("Loss")
+    plt.xlabel("Iteration")
+    plt.yscale('log')
+    plt.grid(True)
+    
+    if save:
+        plt.savefig("./iter_" + str(losses[-1][1]) + ".png")
 
 if __name__ == "__main__":
     # Parse command line arguments
@@ -93,6 +103,8 @@ if __name__ == "__main__":
         iteration_index = 0
     
     losses_train = []
+    losses_plot = []
+    
     model.train()
     torch.set_grad_enabled(True)
 
@@ -139,8 +151,13 @@ if __name__ == "__main__":
             state_dict = model.module.state_dict()
         else:
             state_dict = model.state_dict()
+            
         if (iteration_index) % cfg['train_params']['checkpoint_every_n_steps'] == 0 and not cfg['debug']:
             torch.save(state_dict, f'model_state_{iteration_index}.pth')
+            
+        if (itr) % cfg['plot_every_n_steps'] == 0 and not cfg['debug']:
+            losses_plot.append((loss.item(), itr))
+            __plot_progress(losses_plot, save=True)
         
         losses_train.append(loss.item())
         losses_train = losses_train[-100:]
@@ -151,4 +168,8 @@ if __name__ == "__main__":
             state_dict = model.module.state_dict()
         else:
             state_dict = model.state_dict()
+            
+        losses_plot.append((loss.item(), itr))
+        __plot_progress(losses_plot, save=True)
+        
         torch.save(state_dict, f"model_state_last.pth")
