@@ -3,6 +3,37 @@ import numpy as np
 import torch
 from torch import Tensor
 
+def multi_mode_mse(
+
+    gt: Tensor, pred: Tensor, confidences: Tensor, avails: Tensor
+) -> Tensor:
+    assert len(pred.shape) == 4, f"expected 3D (MxTxC) array for pred, got {pred.shape}"
+    batch_size, num_modes, future_len, num_coords = pred.shape
+
+    assert gt.shape == (batch_size, future_len, num_coords), f"expected 2D (Time x Coords) array for gt, got {gt.shape}"
+    assert confidences.shape == (batch_size, num_modes), f"expected 1D (Modes) array for gt, got {confidences.shape}"
+    assert torch.allclose(torch.sum(confidences, dim=1), confidences.new_ones((batch_size,))), "confidences should sum to 1"
+    assert avails.shape == (batch_size, future_len), f"expected 1D (Time) array for gt, got {avails.shape}"
+    # assert all data are valid
+    assert torch.isfinite(pred).all(), "invalid value found in pred"
+    assert torch.isfinite(gt).all(), "invalid value found in gt"
+    assert torch.isfinite(confidences).all(), "invalid value found in confidences"
+    assert torch.isfinite(avails).all(), "invalid value found in avails"
+
+    # convert to (batch_size, num_modes, future_len, num_coords)
+    gt = torch.unsqueeze(gt, 1)  # add modes
+    avails = avails[:, None, :, None]  # add modes and cords
+
+    # error (batch_size, num_modes, future_len)
+    error = torch.sum(((gt - pred) * avails) ** 2, dim=-1)  # reduce coords and use availability
+    # error (batch_size, num_modes)
+    error = torch.mean(error, -1)
+
+    error = error * confidences
+
+    return torch.mean(error)
+
+   
 
 def pytorch_neg_multi_log_likelihood_batch(
     gt: Tensor, pred: Tensor, confidences: Tensor, avails: Tensor
@@ -40,12 +71,6 @@ def pytorch_neg_multi_log_likelihood_batch(
 
     # error (batch_size, num_modes, future_len)
     error = torch.sum(((gt - pred) * avails) ** 2, dim=-1)  # reduce coords and use availability
-    # error (batch_size, num_modes)
-    error = torch.mean(error, -1)
-
-    error = error * confidences
-
-    return torch.mean(error)
 
     with np.errstate(divide="ignore"):  # when confidence is 0 log goes to -inf, but we're fine with it
         # error (batch_size, num_modes)

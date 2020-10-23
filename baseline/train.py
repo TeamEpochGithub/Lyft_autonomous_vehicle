@@ -1,3 +1,4 @@
+from argparse import ArgumentError
 import numpy as np
 
 import torch
@@ -85,10 +86,20 @@ if __name__ == "__main__":
 
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
     
+    loss_config = cfg["train_params"]["loss"]
+
+    criterion = None
+
     if multi_mode:
-        criterion = loss_functions.pytorch_neg_multi_log_likelihood_batch
-    elif cfg["train_params"]["loss"] == "mse":
+        if loss_config == "mse":
+            criterion = loss_functions.multi_mode_mse
+        elif loss_config == "log_likelihood":
+            criterion = loss_functions.pytorch_neg_multi_log_likelihood_batch
+    elif loss_config == "mse":
         criterion = nn.MSELoss(reduction="none")
+    
+    if criterion == None:
+        raise ArgumentError("unknown loss function in config: " + loss_config)
 
     # Train loop
     print("Start train loop")
