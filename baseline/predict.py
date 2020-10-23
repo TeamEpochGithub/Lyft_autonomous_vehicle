@@ -118,7 +118,8 @@ if __name__ == "__main__":
             for agent_coords, world_from_agent, centroid in zip(agents_coords, world_from_agents, centroids):
                 if multi_mode:
                     if True:
-                        predictions = transform_points(agent_coords[:, :])
+                        predictions = agent_coords.transpose(2, 0, 1)
+                        # print(predictions.shape)
                     else:
                         predictions = np.zeros((3, 50, 2))
                         for i in range(3):
