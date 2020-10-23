@@ -40,6 +40,7 @@ def pytorch_neg_multi_log_likelihood_batch(
 
     # error (batch_size, num_modes, future_len)
     error = torch.sum(((gt - pred) * avails) ** 2, dim=-1)  # reduce coords and use availability
+    return torch.mean(error)
 
     with np.errstate(divide="ignore"):  # when confidence is 0 log goes to -inf, but we're fine with it
         # error (batch_size, num_modes)
