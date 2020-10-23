@@ -135,11 +135,11 @@ if __name__ == "__main__":
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        if multi_gpu:
-            state_dict = model.module.state_dict()
-        else:
-            state_dict = model.state_dict()
         if (iteration_index) % cfg['train_params']['checkpoint_every_n_steps'] == 0 and not cfg['debug']:
+            if multi_gpu:
+                state_dict = model.module.state_dict()
+            else:
+                state_dict = model.state_dict()
             torch.save(state_dict, f'model_state_{iteration_index}.pth')
         
         losses_train.append(loss.item())
