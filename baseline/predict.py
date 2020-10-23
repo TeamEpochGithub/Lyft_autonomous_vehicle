@@ -101,7 +101,12 @@ if __name__ == "__main__":
             with autocast() if torch.cuda.is_available() else nullcontext:
                 if multi_mode:
                     predictions, confidences = model(data["image"].to(device))
-                    predictions = predictions.reshape(target_positions.shape + (3,))
+                    # print("initial =", predictions.shape)
+                    # predictions = predictions.reshape(target_positions.shape + (3,))
+
+                    # print("after reshape =", predictions.shape)
+
+                    predictions = predictions.permute(0, 2, 3, 1)
 
                     confidences = confidences.cpu().numpy()
                 else:
