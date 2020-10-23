@@ -68,3 +68,7 @@ train_params:
   max_num_steps: -1
   eval_every_n_steps: -1
   loss: "mse"
+
+###################
+## Plot params
+plot_every_n_steps: 1000
