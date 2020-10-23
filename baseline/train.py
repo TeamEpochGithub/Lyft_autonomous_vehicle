@@ -38,7 +38,7 @@ def __plot_progress(losses, save=False):
     plt.grid(True)
     
     if save:
-        plt.savefig("./iter_" + str(losses[-1][1]) + ".png")
+        plt.savefig("/loss_graphs/loss_iter_" + str(losses[-1][1]) + ".png")
 
 if __name__ == "__main__":
     # Parse command line arguments
