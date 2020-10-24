@@ -5,7 +5,7 @@ debug: False
 ###################
 ## Model options
 model_params:
-  multi_mode: False
+  multi_mode: True
   model_architecture: "resnet50"
   pretrained: True
   first_layer_bias: False
