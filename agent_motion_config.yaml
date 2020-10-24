@@ -7,7 +7,7 @@ debug: False
 model_params:
   multi_mode: True
   model_architecture: "resnet50"
-  pretrained: True
+  pretrained: False
   first_layer_bias: False
 
   history_num_frames: 10
