@@ -39,6 +39,7 @@ class BaselineModel(nn.Module):
             self.backbone = backbone
 
     def forward(self, x):
+        print(x[0, 5, 101,100])
         y = self.backbone(x)
 
         if self.multi_mode:
