@@ -2,7 +2,7 @@ import torch
 import torchvision
 
 from torch import nn
-from torchvision.models.resnet import resnet50
+from torchvision.models.resnet import resnet50, resnet101
 from typing import Dict
 
 class BaselineModel(nn.Module):
@@ -22,9 +22,14 @@ class BaselineModel(nn.Module):
         history_channel_count = (conf["model_params"]["history_num_frames"] + 1) * 2
         total_channel_count = 3 + history_channel_count
 
-        if conf["model_params"]["model_architecture"] == "resnet50":
-            backbone = resnet50(pretrained=conf["model_params"]["pretrained"])
+        architecture = conf["model_params"]["model_architecture"]
 
+        if architecture == "resnet50":
+            backbone = resnet50(pretrained=conf["model_params"]["pretrained"])  
+        elif architecture == "resnet101":
+            backbone = resnet101(pretrained=conf["model_params"]["pretrained"])  
+
+        if architecture in ["resnet50", "resnet101"]:
             backbone.conv1 = nn.Conv2d(
                 total_channel_count,
                 backbone.conv1.out_channels,
