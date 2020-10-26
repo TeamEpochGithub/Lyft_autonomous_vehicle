@@ -28,6 +28,7 @@ import matplotlib.pyplot as plt
 
 import models
 from models import BaselineModel
+import sampler
 
 import loss_functions
 
@@ -68,7 +69,7 @@ if __name__ == "__main__":
     train_zarr = ChunkedDataset(dm.require(train_cfg["key"])).open()
     train_dataset = AgentDataset(cfg, train_zarr, rasterizer)
     train_dataloader = DataLoader(train_dataset, shuffle=train_cfg["shuffle"], batch_size=train_cfg["batch_size"], 
-                                  num_workers=train_cfg["num_workers"])
+                                  num_workers=train_cfg["num_workers"], sampler=sampler.RandomSampler(13, 0, len(train_dataset)))
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
