@@ -86,7 +86,7 @@ if __name__ == "__main__":
     if multi_gpu:
         model = nn.DataParallel(model)
 
-    optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = optim.Adam(model.parameters(), lr=cfg["train_params"]["lr"])
     
     loss_config = cfg["train_params"]["loss"]
 
