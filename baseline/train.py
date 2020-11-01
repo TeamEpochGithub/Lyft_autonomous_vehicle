@@ -141,7 +141,7 @@ if __name__ == "__main__":
         targets = data["target_positions"].to(device)
         target_availabilities = data["target_availabilities"].to(device)
 
-        with autocast() if not torch.cuda.is_available() else nullcontext():
+        with autocast() if torch.cuda.is_available() else nullcontext():
             if multi_mode:
                 predictions, confidences = model(
                     data["image"].to(device)
