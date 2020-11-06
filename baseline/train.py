@@ -155,7 +155,8 @@ if __name__ == "__main__":
                 # print('target avail shape', target_availabilities.shape)
                 for i in range(targets.shape[0]):
                     score = loss_functions.pytorch_neg_multi_log_likelihood(targets[i], predictions[i], confidences[i], target_availabilities[i])
-                    np.append(scores, score)
+                    print(score)
+                    scores = np.append(scores, score)
             else:
                 target_availabilities = target_availabilities.unsqueeze(-1)
                 output = model(
