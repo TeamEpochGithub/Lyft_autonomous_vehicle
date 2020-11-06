@@ -149,12 +149,13 @@ if __name__ == "__main__":
                 )
 
                 loss = loss_functions.pytorch_neg_multi_log_likelihood_batch(targets, predictions, confidences, target_availabilities)
-                print('targets shape', targets.shape)
-                print('preds shape', predictions.shape)
-                print('confidences shape', confidences.shape)
-                print('target avail shape', target_availabilities.shape)
-                score = loss_functions.pytorch_neg_multi_log_likelihood(targets, predictions, confidences, target_availabilities)
-                np.append(scores, score)
+                # print('targets shape', targets.shape)
+                # print('preds shape', predictions.shape)
+                # print('confidences shape', confidences.shape)
+                # print('target avail shape', target_availabilities.shape)
+                for i in batch_size:
+                    score = loss_functions.pytorch_neg_multi_log_likelihood(targets[i], predictions[i], confidences[i], target_availabilities[i])
+                    np.append(scores, score)
             else:
                 target_availabilities = target_availabilities.unsqueeze(-1)
                 output = model(
