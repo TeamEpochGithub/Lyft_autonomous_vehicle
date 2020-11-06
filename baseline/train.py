@@ -124,7 +124,8 @@ if __name__ == "__main__":
     model.train()
     torch.set_grad_enabled(True)
 
-    
+    scores = np.array([])
+
     for itr in progress_bar:
         if all_data:
             data = itr
@@ -148,6 +149,8 @@ if __name__ == "__main__":
                 )
 
                 loss = loss_functions.pytorch_neg_multi_log_likelihood_batch(targets, predictions, confidences, target_availabilities)
+                score = loss_functions.pytorch_neg_multi_log_likelihood(targets, predictions, confidences, target_availabilities)
+                np.append(scores, score)
             else:
                 target_availabilities = target_availabilities.unsqueeze(-1)
                 output = model(
@@ -170,6 +173,7 @@ if __name__ == "__main__":
             else:
                 state_dict = model.state_dict()
             torch.save(state_dict, f'model_state_{iteration_index}.pth')
+            print('Current Score is ', scores.mean())
             
         if (iteration_index) % plot_every_n_steps == 0 and not cfg['debug']:
             losses_plot.append((np.mean(losses_train), iteration_index))
@@ -189,3 +193,5 @@ if __name__ == "__main__":
         plot_progress(losses_plot, save=True)
         
         torch.save(state_dict, f"model_state_last.pth")
+
+        print('Training Done, Final Score is ', scores.mean())

@@ -47,40 +47,7 @@ def pytorch_neg_multi_log_likelihood(
     return error
 
 if __name__ == "__main__":
-    # Parse command line arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--submission-file", type=str, help="path to the submission.csv")  # Idk if needed
-    # parser.add_argument("--config", type=str, help="Location of the config file")  # Idk if needed
-    # parser.add_argument("--weight-file", type=str, help="path to the file containing the weights for the model")  # Idk if needed
 
-    args = parser.parse_args()
-
-    # get ground truth data (gt, avails)
-    val_data = 000  # Place holder for valuation data
-    gt = val_data["target_positions"].to(device)  # I think so? someone check? | Needs to be a (50,2) np array
-    avails = val_data["target_availabilities"].to(device)  # Needs to be a (50,) np array
-
-    # open submission.csv and get data (pred, confidences)
-    submission = args.submission_file
-    df = pd.read_csv("submission.csv")
-
-    xy0 = []
-    xy1 = []
-    xy2 = []
-
-    # NOTE: i don't know if i need to take the mean, but i don't see how else the shape will become (3, 50, 2)
-    #       over the whole submission csv
-    for i in range(50):  # T = 50
-        xy0.append(np.array([df['coord_x0' + str(i)].mean(), df['coord_y0' + str(i)].mean()]))
-        xy1.append(np.array([df['coord_x1' + str(i)].mean(), df['coord_y1' + str(i)].mean()]))
-        xy2.append(np.array([df['coord_x2' + str(i)].mean(), df['coord_y2' + str(i)].mean()]))
-
-    pred = np.array([xy0, xy1, xy2]) # Needs to be a (3,50,2) np array
-
-    summed_conf = df[['conf_0', 'conf_1', 'conf_2']].sum()
-    confidences = np.array([summed_conf[0], summed_conf[1], summed_conf[2]])  # Needs to be a (3,) np array
-
-    # make the actual calculation :)
     value_torch = pytorch_neg_multi_log_likelihood(
         torch.tensor(gt),
         torch.tensor(pred),
