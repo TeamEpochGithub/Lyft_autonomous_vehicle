@@ -153,7 +153,7 @@ if __name__ == "__main__":
                 # print('preds shape', predictions.shape)
                 # print('confidences shape', confidences.shape)
                 # print('target avail shape', target_availabilities.shape)
-                for i in targets.shape[0]:
+                for i in range(targets.shape[0]):
                     score = loss_functions.pytorch_neg_multi_log_likelihood(targets[i], predictions[i], confidences[i], target_availabilities[i])
                     np.append(scores, score)
             else:
