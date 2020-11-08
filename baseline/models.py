@@ -29,7 +29,9 @@ class BaselineModel(nn.Module):
         elif architecture == "resnet101":
             backbone = resnet101(pretrained=conf["model_params"]["pretrained"])
         elif architecture == "resnet34":
-            backbone = resnet34(pretrained=conf["model_params"]["pretrained"])
+            # backbone = resnet34(pretrained=conf["model_params"]["pretrained"])
+            architecture = conf["model_params"]["pretrained"]
+            backbone = eval(architecture)
 
         if architecture in ["resnet50", "resnet101", "resnet34"]:
             backbone.conv1 = nn.Conv2d(
@@ -40,8 +42,11 @@ class BaselineModel(nn.Module):
                 padding=backbone.conv1.padding,
                 bias=conf["model_params"]["first_layer_bias"], # Maybe True is better?
             )
-            
-            backbone.fc = nn.Linear(in_features=2048, out_features=target_count)
+
+            if architecture == "resnet34":
+                backbone.fc = nn.Linear(in_features=512, out_features=4096)
+            else:
+                backbone.fc = nn.Linear(in_features=2048, out_features=target_count)
 
             self.backbone = backbone
 
