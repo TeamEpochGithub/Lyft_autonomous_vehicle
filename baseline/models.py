@@ -29,9 +29,9 @@ class BaselineModel(nn.Module):
         elif architecture == "resnet101":
             backbone = resnet101(pretrained=conf["model_params"]["pretrained"])
         elif architecture == "resnet34":
-            # backbone = resnet34(pretrained=conf["model_params"]["pretrained"])
-            architecture = conf["model_params"]["pretrained"]
-            backbone = eval(architecture)
+            backbone = resnet34(pretrained=conf["model_params"]["pretrained"])
+            # architecture = conf["model_params"]["pretrained"]
+            # backbone = eval(architecture)
 
         if architecture in ["resnet50", "resnet101", "resnet34"]:
             backbone.conv1 = nn.Conv2d(
