@@ -2,6 +2,7 @@ from argparse import ArgumentError
 import numpy as np
 
 import torch
+from l5kit.geometry import transform_points
 from torch import nn, optim
 from torch.utils.data import DataLoader
 from torch.cuda.amp import autocast
@@ -25,12 +26,50 @@ import argparse
 from tqdm import tqdm
 
 import matplotlib.pyplot as plt
+import cv2
 
 import models
 from models import BaselineModel
 import sampler
 
 import loss_functions
+
+def visualize_predictions(dataset, data, predictions, batch_index, title="targets and predictions"):
+    img = data["image"][batch_index].numpy()
+    print(img.shape)
+    img = img.transpose(1, 2, 0)
+    img = dataset.rasterizer.to_rgb(img)
+    img = cv2.UMat(img)
+    centroid = data["centroid"][batch_index][:2].numpy()
+    print(centroid.shape)
+    wti = data["world_to_image"][batch_index].numpy()
+    print(wti.shape)
+    targets = data["target_positions"][batch_index].numpy()
+    print(targets.shape)
+    yaws = data["target_yaws"][batch_index].numpy()
+    print(yaws.shape)
+
+    print(predictions.shape)
+    predictions = predictions[batch_index].numpy()
+    print(predictions.shape)
+
+
+    target_positions_pixels = transform_points(targets + centroid, wti)
+    draw_trajectory(img, target_positions_pixels, TARGET_POINTS_COLOR, radius=3, yaws=yaws)
+    i = 40
+    for pred in predictions:
+        print(pred.shape)
+        color = list(TARGET_POINTS_COLOR)
+        color[0] = color[0]-i
+        color[2] = color[2]-i
+        i += 40
+        target_pred_pixels = transform_points(pred + centroid, wti)
+        draw_trajectory(img, target_pred_pixels, color, radius=3, yaws=yaws)
+
+    img = cv2.UMat.get(img)
+    plt.title(title)
+    plt.imshow(img[::-1])
+    plt.show()
 
 def plot_progress(losses, save=False):
     plt.plot([x[1] for x in losses], [x[0] for x in losses])
@@ -144,6 +183,7 @@ if __name__ == "__main__":
                 predictions, confidences = model(
                     data["image"].to(device)
                 )
+                p = predictions
 
                 loss = loss_functions.pytorch_neg_multi_log_likelihood_batch(targets, predictions, confidences, target_availabilities)
             else:
@@ -172,7 +212,8 @@ if __name__ == "__main__":
         if (iteration_index) % plot_every_n_steps == 0 and not cfg['debug']:
             losses_plot.append((np.mean(losses_train), iteration_index))
             plot_progress(losses_plot, save=True)
-        
+
+        visualize_predictions(train_dataset, data, p, 0)
         losses_train.append(loss.item())
         losses_train = losses_train[-plot_every_n_steps:]
         progress_bar.set_description(f"loss: {loss.item()} loss(avg): {np.mean(losses_train)}")

@@ -70,10 +70,15 @@ def visualize_predictions(dataset, data, predictions, batch_index, title="target
 
     target_positions_pixels = transform_points(targets + centroid, wti)
     draw_trajectory(img, target_positions_pixels, TARGET_POINTS_COLOR, radius=3, yaws=yaws)
+    i = 40
     for pred in predictions:
         print(pred.shape)
+        color = list(TARGET_POINTS_COLOR)
+        color[0] = color[0]-i
+        color[2] = color[2]-i
+        i += 40
         target_pred_pixels = transform_points(pred + centroid, wti)
-        draw_trajectory(img, target_pred_pixels, TARGET_POINTS_COLOR, radius=3, yaws=yaws)
+        draw_trajectory(img, target_pred_pixels, color, radius=3, yaws=yaws)
 
     img = cv2.UMat.get(img)
     plt.title(title)
@@ -166,7 +171,6 @@ if __name__ == "__main__":
                 # print("after reshape =", predictions.shape)
 
                 predictions = predictions.permute(0, 2, 3, 1)
-
 
                 confidences = confidences.cpu().numpy()
             else:
