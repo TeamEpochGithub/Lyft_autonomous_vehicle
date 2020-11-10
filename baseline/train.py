@@ -72,14 +72,10 @@ if __name__ == "__main__":
             #, shuffle=train_cfg["shuffle"]
         , batch_size=train_cfg["batch_size"], num_workers=train_cfg["num_workers"], sampler=sampler.RandomSampler(13, 0, len(train_dataset)))
 
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cpu")
 
     # Create model
     model = BaselineModel(cfg)
-    if args.weight_file != None:
-        model.load_state_dict(
-            torch.load(args.weight_file)
-        )
     
     model.to(device)
     multi_gpu = args.multi_gpu
@@ -137,6 +133,8 @@ if __name__ == "__main__":
                 data = next(tr_it)
             iteration_index = itr + 1
 
+
+        print(data["image"].shape)
         # Calculate loss
         targets = data["target_positions"].to(device)
         target_availabilities = data["target_availabilities"].to(device)
