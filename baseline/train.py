@@ -50,7 +50,7 @@ def visualize_predictions(dataset, data, predictions, batch_index, title="target
     print(yaws.shape)
 
     print(predictions.shape)
-    predictions = predictions[batch_index].numpy()
+    predictions = predictions[batch_index].detach().numpy()
     print(predictions.shape)
 
 
@@ -111,7 +111,7 @@ if __name__ == "__main__":
             #, shuffle=train_cfg["shuffle"]
         , batch_size=train_cfg["batch_size"], num_workers=train_cfg["num_workers"], sampler=sampler.RandomSampler(13, 0, len(train_dataset)))
 
-    device = torch.device("cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     # Create model
     model = BaselineModel(cfg)
@@ -213,7 +213,7 @@ if __name__ == "__main__":
             losses_plot.append((np.mean(losses_train), iteration_index))
             plot_progress(losses_plot, save=True)
 
-        visualize_predictions(train_dataset, data, p, 0)
+        # visualize_predictions(train_dataset, data, p, 0)
         losses_train.append(loss.item())
         losses_train = losses_train[-plot_every_n_steps:]
         progress_bar.set_description(f"loss: {loss.item()} loss(avg): {np.mean(losses_train)}")
