@@ -6,7 +6,7 @@ debug: False
 ## Model options
 model_params:
   multi_mode: True
-  model_architecture: "resnet101"
+  model_architecture: "resnet34"
   pretrained: False
   first_layer_bias: False
 
@@ -51,15 +51,15 @@ raster_params:
 ## Data loader options
 train_data_loader:
   key: "scenes/train.zarr"
-  batch_size: 32
+  batch_size: 64
   shuffle: True
-  num_workers: 32
+  num_workers: 64
 
 val_data_loader:
   key: "scenes/test.zarr"
-  batch_size: 32
+  batch_size: 64
   shuffle: False
-  num_workers: 32
+  num_workers: 64
 
 ###################
 ## Train params
@@ -69,6 +69,8 @@ train_params:
   eval_every_n_steps: -1
   loss: "mse"
   lr: 0.001
+  optimizer: "sgd"
+
 ###################
 ## Plot params
 plot_every_n_steps: 1000

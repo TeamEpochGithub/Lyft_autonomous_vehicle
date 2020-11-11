@@ -86,8 +86,11 @@ if __name__ == "__main__":
     if multi_gpu:
         model = nn.DataParallel(model)
 
-    optimizer = optim.Adam(model.parameters(), lr=cfg["train_params"]["lr"])
-    
+    if cfg["train_params"]["optimizer"] == "adam":
+        optimizer = optim.Adam(model.parameters(), lr=cfg["train_params"]["lr"])
+    elif cfg["train_params"]["optimizer"] == "sgd":
+        optimizer = optim.SGD(model.parameters(), lr=cfg["train_params"]["lr"])
+
     loss_config = cfg["train_params"]["loss"]
 
     criterion = None
