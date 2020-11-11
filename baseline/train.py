@@ -50,7 +50,7 @@ def visualize_predictions(dataset, data, predictions, batch_index, title="target
     print(yaws.shape)
 
     print(predictions.shape)
-    predictions = predictions[batch_index].detach().numpy()
+    predictions = predictions[batch_index].cpu().detach().numpy()
     print(predictions.shape)
 
 
@@ -58,7 +58,7 @@ def visualize_predictions(dataset, data, predictions, batch_index, title="target
     draw_trajectory(img, target_positions_pixels, TARGET_POINTS_COLOR, radius=3, yaws=yaws)
     i = 40
     for pred in predictions:
-        print(pred.shape)
+        print("pred shape = ", pred.shape)
         color = list(TARGET_POINTS_COLOR)
         color[0] = color[0]-i
         color[2] = color[2]-i
@@ -173,7 +173,7 @@ if __name__ == "__main__":
             iteration_index = itr + 1
 
 
-        print(data["image"].shape)
+        print("img_shape =", data["image"].shape)
         # Calculate loss
         targets = data["target_positions"].to(device)
         target_availabilities = data["target_availabilities"].to(device)
@@ -212,8 +212,11 @@ if __name__ == "__main__":
         if (iteration_index) % plot_every_n_steps == 0 and not cfg['debug']:
             losses_plot.append((np.mean(losses_train), iteration_index))
             plot_progress(losses_plot, save=True)
-
-        # visualize_predictions(train_dataset, data, p, 0)
+# torch.cat([targets.reshape(targets.shape + (1,))] * 3, dim=3)
+        print("targets =", targets)
+        print("targets shape=", torch.cat([targets.reshape(targets.shape + (1,))] * 3, dim=3).shape)
+        print("real predictions shape =", predictions.shape)
+        visualize_predictions(train_dataset, data, torch.cat([targets.reshape(targets.shape + (1,))] * 3, dim=3).permute(0, 3, 1, 2), 0)
         losses_train.append(loss.item())
         losses_train = losses_train[-plot_every_n_steps:]
         progress_bar.set_description(f"loss: {loss.item()} loss(avg): {np.mean(losses_train)}")
