@@ -67,7 +67,7 @@ train_params:
   checkpoint_every_n_steps: 10000
   max_num_steps: -1
   eval_every_n_steps: -1
-  loss: "mse"
+  loss: "log_likelihood"
   lr: 0.001
   optimizer: "sgd"
 
