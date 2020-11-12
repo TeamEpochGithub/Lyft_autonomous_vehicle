@@ -6,7 +6,7 @@ debug: False
 ## Model options
 model_params:
   multi_mode: True
-  model_architecture: "resnet101"
+  model_architecture: "resnet34"
   pretrained: False
   first_layer_bias: False
 
