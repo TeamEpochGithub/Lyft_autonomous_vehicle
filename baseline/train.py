@@ -32,6 +32,8 @@ import sampler
 
 import loss_functions
 
+import torch_optimizer
+
 def plot_progress(losses, save=False):
     plt.plot([x[1] for x in losses], [x[0] for x in losses])
     plt.ylabel("Loss")
@@ -86,7 +88,8 @@ if __name__ == "__main__":
     if multi_gpu:
         model = nn.DataParallel(model)
 
-    optimizer = optim.Adam(model.parameters(), lr=cfg["train_params"]["lr"])
+    # optimizer = optim.Adam(model.parameters(), lr=cfg["train_params"]["lr"])
+    optimizer = torch_optimizer.adamp(model.parameters(), lr=cfg["train_params"]["lr"])
     
     loss_config = cfg["train_params"]["loss"]
 

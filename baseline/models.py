@@ -44,7 +44,7 @@ class BaselineModel(nn.Module):
             )
 
             if architecture == "resnet34":
-                backbone.fc = nn.Linear(in_features=512, out_features=4096)
+                backbone.fc = nn.Linear(in_features=512, out_features=target_count)
             else:
                 backbone.fc = nn.Linear(in_features=2048, out_features=target_count)
 
