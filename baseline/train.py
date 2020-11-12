@@ -31,8 +31,7 @@ from models import BaselineModel
 import sampler
 
 import loss_functions
-
-import torch_optimizer
+from torch_optimizer import AdamP
 
 def plot_progress(losses, save=False):
     plt.plot([x[1] for x in losses], [x[0] for x in losses])
@@ -93,7 +92,7 @@ if __name__ == "__main__":
     elif cfg["train_params"]["optimizer"] == "sgd":
         optimizer = optim.SGD(model.parameters(), lr=cfg["train_params"]["lr"])
     elif cfg["train_params"]["optimizer"] == "adamp":
-        optimizer = torch_optimizer.adamp(model.parameters(), lr=cfg["train_params"]["lr"])
+        optimizer = AdamP(model.parameters(), lr=cfg["train_params"]["lr"])
 
     loss_config = cfg["train_params"]["loss"]
 
