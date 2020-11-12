@@ -92,6 +92,8 @@ if __name__ == "__main__":
         optimizer = optim.Adam(model.parameters(), lr=cfg["train_params"]["lr"])
     elif cfg["train_params"]["optimizer"] == "sgd":
         optimizer = optim.SGD(model.parameters(), lr=cfg["train_params"]["lr"])
+    elif cfg["train_params"]["optimizer"] == "sgd":
+        optimizer = torch_optimizer.adamp(model.parameters(), lr=cfg["train_params"]["lr"])
 
     loss_config = cfg["train_params"]["loss"]
 
