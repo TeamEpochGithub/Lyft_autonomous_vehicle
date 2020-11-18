@@ -70,6 +70,8 @@ train_params:
   loss: "log_likelihood"
   lr: 0.001
   optimizer: "adam"
+  seed: 256
+  validation_batches: 16
 
 ###################
 ## Plot params

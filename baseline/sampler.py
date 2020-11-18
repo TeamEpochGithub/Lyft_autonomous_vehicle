@@ -7,7 +7,7 @@ class RandomSampler:
         self.length = end - start
         self.start = start
         
-        self.permutation = np.random.RandomState(seed).permutation(np.arange(self.length)) + start
+        self.permutation = np.random.RandomState(seed).permutation(np.arange(end))[start:]
 
     def __iter__(self):
         for idx in self.permutation:
